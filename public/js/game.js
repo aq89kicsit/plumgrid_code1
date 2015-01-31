@@ -43,7 +43,8 @@
 		ctx = canvas.getContext("2d");
 		
 		spritesheet = new Image();
-		spritesheet.src = 'img/spritesheet.png';
+		spritesheet.src = 'http://epicanka.com/celib/code1/public/img/spritesheet.png';
+		//spritesheet.src = 'img/spritesheet.png';
 		robot = new Image();
 		robot.src = 'img/robot.png';
 		//alert(spritesheet.src);
@@ -77,21 +78,21 @@
 		currentPath = [];
 		updateRobotLocation(newpointsrobot);		// update the robot position
 		//console.log(" Robot Position " + robotPosition);
-		startCleanTrash();
+		
 		/* while (currentPath.length == 0){	// i think i need to use this in a separate function
 			
-			//pathStart = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
 			pathStart = robotPosition;
-			//pathEnd = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
-			pathEnd = [3,4];
-
+			pathEnd = [trachj[l],trachk[l];
+			
 			if (world[pathStart[0]][pathStart[1]] == 0){
 				currentPath = findPath(world,pathStart,pathEnd);
 			}else{
 			}
 		} */
 		//console.log("Current Path is "+currentPath);
+		
 		redraw();
+		startCleanTrash();
 	}
 	function startCleanTrash(){
 		//i think i need to update this array currentPathArray after cleaning
@@ -99,10 +100,37 @@
 		// i need to update the robot position too
 		
 		var tNTrash = nearestTrash();
+		
+////////////////////////////////////////////////////////////		
+//console.log('Current path length: '+currentPath.length);/
+var cpav = currentPathArray[tNTrash[2]];
+console.log("Path Array New Mean");
+console.log(cpav);
+for (rp=0; rp<cpav.length; rp++){
+	switch(rp){
+		case 0:
+			spriteNum = 2; // start
+			break;
+		case cpav.length-1:
+			spriteNum = 3; // end
+			break;
+		default:
+			spriteNum = 4; // path node
+			break;
+	}
+
+	ctx.drawImage(spritesheet,
+	spriteNum*tileWidth, 0,
+	tileWidth, tileHeight,
+	cpav[rp][0]*tileWidth,
+	cpav[rp][1]*tileHeight,
+	tileWidth, tileHeight);
+}
+////////////////////////////////////////////////////////////////
 		console.log(world);
 		world[tNTrash[0]][tNTrash[1]] = 0;
-		//console.log("New world");
-		//console.log(world);
+		console.log("Nearest Trash is :");
+		console.log(tNTrash);
 		
 		updateRobotLocation([tNTrash[0],tNTrash[1]]);
 		
@@ -111,6 +139,7 @@
 		robotPosition = newRobotPosition;	// need to update when needed
 	}
 	function nearestTrash(){	// return index for lowestOneIndex which one is lowest
+		//alert(robotPosition);
 		pathStart = robotPosition;
 		var nearestTrashIs = 0;
 		var lowestOne = 100;		// dummy value may be  need to change 
@@ -126,10 +155,15 @@
 				trackIndex[1] = trachk[l];
 				lowestOne = currentPathArray[l].length;
 				lowestOneIndex = l;
+				trackIndex[2] = lowestOneIndex;	// i think i need currentPathArray Index
 				console.log("Path Array");
 				console.log(currentPathArray[l]);
+				
 			}
 		}
+		var temp = currentPathArray[lowestOneIndex];
+		temp.toString();
+		$("#robotDirection").html(temp + " - ");
 		return trackIndex;
 	}
 	function checkTrash(){	// should be use for remaining trashes count i think
@@ -167,8 +201,8 @@
 				}
 			}
 		}
-		console.log("Trach Location is ");
-		console.log(trashLocation);
+		//console.log("Trach Location is ");
+		//console.log(trashLocation);
 	}
 	function redraw(){
 		if (!spritesheetLoaded) return;
@@ -201,28 +235,6 @@
 				//ctx.drawImage(spritesheet,x*tileWidth, y*tileHeight,tileWidth, tileHeight);
 			}
 		}
-		
-		//console.log('Current path length: '+currentPath.length);
-		for (rp=0; rp<currentPath.length; rp++){
-			switch(rp){
-				case 0:
-					spriteNum = 2; // start
-					break;
-				case currentPath.length-1:
-					spriteNum = 3; // end
-					break;
-				default:
-					spriteNum = 4; // path node
-					break;
-			}
-
-			ctx.drawImage(spritesheet,
-			spriteNum*tileWidth, 0,
-			tileWidth, tileHeight,
-			currentPath[rp][0]*tileWidth,
-			currentPath[rp][1]*tileHeight,
-			tileWidth, tileHeight);
-		}		
 	}
 
 	// Test Cases For var world = [[0,1,0,0,0,0],[0,0,0,1,0,0],[0,0,0,0,0,0],[0,0,1,0,1,0],[0,0,0,0,0,1],[1,0,0,0,0,0]];	//2d array grid
@@ -245,18 +257,23 @@
 			if (h <= totalTrashesTotal) {            //  if the counter < 10, call the loop function
 				myLoop();             //  ..  again which will trigger another 
 			}                        //  ..  setTimeout()
-		}, 1000)
+		}, 4000)
 	}
 
 	//myLoop();
 	
-	function fnRobotPosition(){
+	function fnRobotPosition(rll){
+		var partsOfStr = rll.split(',');
 		init();
-		var inVal = document.getElementById('robotPosition').value;
-		//alert(inVal);
+		//var inVal = document.getElementById('robotPosition').value;
+		var inVal = new Object();
+		inVal = [parseInt(partsOfStr[0]),parseInt(partsOfStr[1])];
 		checkTrashForTotal();
-		robotPosition = [inVal];
+		robotPosition = inVal;
+		
 		myLoop();
+		console.log("Testing Path is ");
+		console.log(currentPathArray);
 	}
 	function init(){
 		//robotPosition = [0,0];
@@ -285,7 +302,26 @@
 	robotGround([4,5]);
 	robotGround([3,2]); 
 	*/
-	
+	function imgLoad(){
+		canvas = document.getElementById('robotGround');
+		canvas.width = worldWidth * tileWidth;
+		canvas.height = worldHeight * tileHeight;
+		
+		ctx = canvas.getContext("2d");
+		
+		spritesheet = new Image();
+		spritesheet.src = 'http://epicanka.com/celib/code1/public/img/spritesheet.png';
+		//spritesheet.src = 'img/spritesheet.png';
+		robot = new Image();
+		robot.src = 'img/robot.png';
+		//alert(spritesheet.src);
+
+		console.log('Spritesheet loaded.');
+		spritesheetLoaded = true;
+		
+		console.log('Creating world...');
+		redraw();
+	}
 	
 	
 	
